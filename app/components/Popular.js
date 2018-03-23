@@ -26,10 +26,11 @@ class Popular extends React.Component {
 
     return (
       <ul className="languages">
-        {languages.map(function(language) {
+        {languages.map((language) => {
           return (
             <li
               style={language === this.state.selectedLanguage ? { color: '#d0021b' } : null} 
+              // .bind will return us a new function with 'language' passed for function invocation 
               // using .bind -- we don't need to explicitly say bind 'this' here because we've established the correct context in the constructor above on line 14 -- we pass it null since we already bound updateLanguage
               // whatever arguments we pass after the context will be passed along to the initial funtion --> 'language' argument on line 17
               onClick={this.updateLanguage.bind(null, language)}
@@ -38,10 +39,10 @@ class Popular extends React.Component {
             </li>
           )
           // pass in 'this' keyword as second argument to tell .map what we want bound to it
-        }, this)}
+        })}
       </ul>  
     )
-  }	
+  }
 }
 
 module.exports = Popular;
