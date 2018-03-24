@@ -1,46 +1,102 @@
 const React = require('react');
+const PropTypes = require('prop-types');
+const api = require('../utils/api');
+
+function SelectLanguage (props) {
+  const languages = ['All', 'JavaScript', 'Java', 'Ruby', 'CSS', 'Python'];
+
+  return (
+    <ul className='languages'>
+      {languages.map(language => {
+        return (
+          <li
+            style={language === props.selectedLanguage ? { color: '#d0021b' } : null} 
+            onClick={props.onSelect.bind(null, language)}
+            key={language}>
+            {language}
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
+
+SelectLanguage.propTypes = {
+  selectedLanguage: PropTypes.string.isRequired,
+  onSelect: PropTypes.func.isRequired
+}
+
+function RepoGrid(props){
+  return (
+    <ul className='popular-list'>
+      {props.repos.map((repo, index) => {
+        return (
+          <li key={repo.name} className='popular-item'>
+            <div className='popular-rank'>#{index + 1}</div>
+            <ul className='space-list-items'>
+              <li>
+                <img 
+                  className='avatar'
+                  src = {repo.owner.avatar_url}
+                  alt={`Avatar for ${repo.owner.login}`}
+                />
+              </li>
+              <li><a href={repo.html_url}>{repo.name}</a></li>
+              <li>@{repo.owner.login}</li>
+              <li>{repo.stargazers_count} stars</li>
+            </ul>
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
+
+RepoGrid.propTypes = {
+  repos: PropTypes.array.isRequired
+}
 
 class Popular extends React.Component {
-  // need to add constructor to add state
-  // look up what props does on ES6 classes article
   constructor (props) {
     super(props);
     this.state = {
-      selectedLanguage: 'All'
+      selectedLanguage: 'All',
+      repos: null
     };
-    // 2 --> Ask Kelly about this -- this is basically an 'updateLanguage' method on an instance of this Popular class or component
-    // so this would basically be the same as binding an object to a function so when the function is invoked, it will be pointing to the correct instance -- in this case, it will be bound to the correct Popular component
-    // ensures 'updateLanguage' will be called in correct context
     this.updateLanguage = this.updateLanguage.bind(this);
   }
-  // 1 --> method to update state with newly clicked language
+  componentDidMount() {
+    this.updateLanguage(this.state.selectedLanguage)
+  }
   updateLanguage(language) {
     this.setState(function(){
       return {
-        selectedLanguage: language
+        selectedLanguage: language,
+        repos: null
       }
-    })
-  }
-  render() {
-    const languages = ['All', 'JavaScript', 'Ruby', 'CSS', 'Python'];
+    });
 
+    api.fetchPopularRepos(language)
+      .then(response => {
+        this.setState(function(){
+          return {
+            repos: response
+          }
+        })
+      })   
+  }
+  render() {    
     return (
-      <ul className="languages">
-        {languages.map((language) => {
-          return (
-            <li
-              style={language === this.state.selectedLanguage ? { color: '#d0021b' } : null} 
-              // .bind will return us a new function with 'language' passed for function invocation 
-              // using .bind -- we don't need to explicitly say bind 'this' here because we've established the correct context in the constructor above on line 14 -- we pass it null since we already bound updateLanguage
-              // whatever arguments we pass after the context will be passed along to the initial funtion --> 'language' argument on line 17
-              onClick={this.updateLanguage.bind(null, language)}
-              key={language}>
-              {language}
-            </li>
-          )
-          // pass in 'this' keyword as second argument to tell .map what we want bound to it
-        })}
-      </ul>  
+      <div>
+        <SelectLanguage 
+          selectedLanguage={this.state.selectedLanguage}
+          onSelect={this.updateLanguage}
+        />
+        {!this.state.repos
+          ? <p>LOADING...</p>
+          : <RepoGrid repos={this.state.repos} />
+        }
+      </div>    
     )
   }
 }
