@@ -54,6 +54,12 @@ button:focus {
   font-weight: 200;
 }
 
+.header {
+  text-align: center;
+  font-size: 30px;
+  font-weight: 200;
+}
+
 .languages {
   display: flex;
   justify-content: center;
@@ -143,32 +149,3 @@ button:focus {
 .button:active {
   transform: translateY(1px);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
