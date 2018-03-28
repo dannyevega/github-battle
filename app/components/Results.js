@@ -4,6 +4,7 @@ const api = require('../utils/api');
 const Link = require('react-router-dom').Link;
 const PropTypes = require('prop-types');
 const PlayerPreview = require('./PlayerPreview');
+const Loading = require('./Loading');
 
 function Profile(props) {
   const info = props.info;
@@ -60,7 +61,7 @@ class Results extends React.Component {
     api.battle([
       players.playerOneName,
       players.playerTwoName
-    ]).then(function(response) {
+    ]).then(response => {
       if(response === null){
         return this.setState(function() {
           return {
@@ -77,7 +78,7 @@ class Results extends React.Component {
           loading: false
         }
       });
-    }.bind(this));
+    });
   }
   render() {
     const winner = this.state.winner;
@@ -87,7 +88,7 @@ class Results extends React.Component {
 
     if(loading === true) {
       return (
-        <p>Loading...</p>
+        <Loading />
       )
     }
 
